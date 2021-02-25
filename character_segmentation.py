@@ -82,9 +82,9 @@ def _save_images(img, boxes, output_dir, prefix=""):
             x, y, w, h = cv2.boundingRect(c)
             # print(x, y, w, h)
             # print(c)
-            if w > 28 and h > 28:
+            if w > 10 and h > 10:
                 # idx += 1
-                new_img = chip[y-12:y+h+12, x-12:x+w+12]
+                new_img = chip[y-5:y+h+5, x-5:x+w+5]
                 img_resize = cv2.resize(new_img, (128, 128))
 
                 gray_image = cv2.cvtColor(img_resize, cv2.COLOR_BGR2GRAY)
@@ -94,10 +94,8 @@ def _save_images(img, boxes, output_dir, prefix=""):
                 # img_resize = cv2.resize(new_img, (64, 64))
 
                 # img_invert = cv2.bitwise_not(gray_image)
-                kernel = np.ones((3,3), np.uint8) 
-                img_dilated= cv2.dilate(thresh, kernel, iterations=1) 
-
-
+                kernel = np.ones((3, 3), np.uint8)
+                img_dilated = cv2.dilate(thresh, kernel, iterations=1)
 
                 cv2.imwrite(os.path.join(output_dir, prefix +
                                          "_" + str(i) + ".jpg"), img_dilated)
@@ -161,7 +159,7 @@ if __name__ == '__main__':
     if args.input is None:
         print("Input image file or directory to process!")
         print("Example: python character_segmentation.py --input image.jpg --output tmp/")
-      
+
         exit(0)
 
     if _is_dir(args.input):
@@ -169,7 +167,8 @@ if __name__ == '__main__':
     else:
         images = [args.input]
     for i, filename in enumerate(images):
-        success = segment_characters(filename, args.output, prefix=str(i + 1))
+        success = segment_characters(
+            filename, args.output, prefix=filename[-7]+filename[-6]+filename[-5]+"_"+str(i + 1))
         if not success:
             print("Unable to process the file: {}".format(filename))
         if i > 0 and i % 10 == 0:
